@@ -29,9 +29,9 @@
 
 Django projects need to be configured to be deployed.
 
-Django has detailed deployment [docs](https://docs.djangoproject.com/en/3.0/howto/deployment/) and a [checklist](https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/), however, there is dedicated package we will use to make deploying to Heroku much easier.
+Django has detailed deployment [docs](https://docs.djangoproject.com/en/4.1/howto/deployment/) and a [checklist](https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/), however, there is dedicated package we will use to make deploying to Heroku much easier.
 
-> Note:  If you ever deploy a Django app used in production, you'll want to review the [checklist](https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/) mentioned above and implement the additional security precautions.
+> Note:  If you ever deploy a Django app used in production, you'll want to review the [checklist](https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/) mentioned above and implement the additional security precautions.
 ### Install `django-on-heroku`
 
 First, let's install [`django-on-heroku`](https://github.com/pkrefta/django-on-heroku) which is a Python package that will help with the deployment process:
@@ -97,7 +97,10 @@ $ pip3 freeze > requirements.txt
 
 ## 3. Connect a Remote Database
 
-- Navigate to [bit.io](bit.io)
+bit.io is a zero-config cloud database built by and for technical contributors.
+This is a free hosting website for our postgreSQL database. Similair to MongoDB Atlas
+
+- Navigate to [bit.io](https://bit.io/)
 - Create a free account
 - Create a Database and name it
 - Navigate to the Connect tab
