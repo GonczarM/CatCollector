@@ -157,7 +157,7 @@ DEBUG = True if os.environ['MODE'] == 'dev' else False
 ```
 
 
-```
+```py
 # .env/activate
 
 # Env Variables
