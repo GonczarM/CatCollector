@@ -121,7 +121,7 @@ DATABASES = {
 }
 ```
 
-This will reconnect your Django app to your remote database.
+This will change the connection on your Django app to your remote database.
 
 ## 4. Set Environment Variables
 
