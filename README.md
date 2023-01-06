@@ -6,14 +6,11 @@
 
 1. Preparation
 2. Ready the Django Project
-3. Commit the Changes
-4. Deploy to Heroku
-5. Migrate the Database Migrations
-6. Set Environment Variables
-7. Open the Application
-8. Troubleshooting
-9. Create the superuser
-10. Test the Admin Portal
+3. Connect a Remote Database
+4. Set Environment Variables
+5. Commit Changes
+6. Deploy to Heroku
+7. Troubleshooting
 
 ## 1. Preparation
 
@@ -43,8 +40,6 @@ First, let's install [`django-on-heroku`](https://github.com/pkrefta/django-on-h
 ```
 $ pip install django-on-heroku
 ```
-
-### Update `settings.py`
 
 There are several changes we would have to make to `settings.py` in order to be able to deploy.
 
@@ -132,6 +127,8 @@ This will reconnect your Django app to your remote database.
 
 We need to set environment variables (secrets) on Heroku in the same way we needed to set our environmental variables in Unit 3.
 
+### Secret Key
+
 You'll notice that the settings.py contains a warning not to leave your secret key in production so copy the value and replace the line with the following:
 
 ```
@@ -145,6 +142,9 @@ Then navigate to your .env/activate file and at the very bottom of the file crea
 export SECRET_KEY='<your secret key>'
 ```
 > Note: If you accidentally publish your secret key to GitHub you can generate a new one [here](https://djecrety.ir/).
+
+### Debug Mode
+
 Note the message to not run debug in production. Instead, we'll create an environment variable called MODE and set it to 'dev' in our .env/activate file locally and 'production' in the Heroku configvars. We can use a ternary operator to set the DEBUG to True or False based on the environment variable.
 
 
@@ -162,6 +162,26 @@ export SECRET_KEY='<your secret key>'
 export MODE='dev'
 ```
 
+### Database Password
+
+We need to limit the accessibility of our database to just this application. We can set the database password to an env variable for that security.
+
+settings.py
+```
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': '<Database name>',
+        'USER': '<Username>',
+        'PASSWORD': os.environ['DB_PASSWORD'],
+        'HOST': 'db.bit.io',
+        'PORT': '5432',
+    }
+}
+```
+
+Add this env variable to your .env/activate file.
+
 Create a .gitignore file in the root of your repo and add `.env` to it. 
 
 
@@ -172,37 +192,35 @@ Now let's commit the changes made to the project (make sure that you're on the `
 ```
 $ git add -A
 $ git commit -m "Config deployment"
+$ git push origin main
 ```
 
 ## 6. Deploy to Heroku
 
-The `heroku` remote was added to the repo with the `heroku create` command ran earlier.
+### Create Heroku App
 
-So, deploying the first time and re-deploying later is as easy as running this command:
+- Open up your [Heroku Dashboard](https://dashboard.heroku.com) and create a new app.
+- Name your app and then create.
+- Just like Unit 3 we are going to connect to GitHub with Heroku.
+- Once you have logged in with github, search for the repo you want to deploy and connect.
+- Enable Automatic Deploys and deploy the main branch.
+- On first deploy of a postgres db heroku will create a PostgreSQL "mini" database add-on. We will using bit.io instead so luckily, once removed, Heroku won't add it back in subsequent deployments.
+- To remove this add-on navigate to the Resources tab and delete the PostgreSQL add-on
 
-```
-$ git push heroku main
-```
+### Config Vars
 
-Read the output during deployment carefully. You'll need to address the errors if the deployment fails.
+- Navigate over to the Settings tab and Reveal Config Vars
+- This is where you will create the key value pairs for each of your env variables. 
+- DB_PASSWORD and SECRET_KEY should remain the same
+- MODE will change its value to production
+> Note: you do not need qoutation marks for your values on heroku
 
-## 7. Open the Application
+Once you have added all your config vars restart your dyno by clicking the more button in the top right and selcet Restart all dynos
 
-Let's check it out!
-
-```
-$ heroku open
-```
+Your app should then deploy and build successfully!
 
 Since the database is new, there will not be any users or data.  After creating a new cat, celebrate! 
 
-## 8. Troubleshooting
-
-The following command shows Heroku's log for our app and is useful for troubleshooting.  The log also contains the output from your app's `print()` statements:
-
-```
-$ heroku logs
-``` 
-
+You can view the build logs in the Activity Tab on heroku for troubleshooting.
 
 ### Congrats!
