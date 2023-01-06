@@ -27,44 +27,7 @@
 
 - Make sure that the `main` branch is checked out
 
-### Heroku Account & Toolbelt
-
-You already got set up with Heroku in Unit 3.
-
-[Click here](https://dashboard.heroku.com) to open your Heroku Dashboard.
-
-Verify that the [Heroku Toolbelt](https://devcenter.heroku.com/articles/heroku-cli) is installed by typing the following in terminal:
-
-```
-$ heroku
-```
-
-You should see a list of commands available.
-
-Run the following command to check if you're logged in:
-
-```
-$ heroku auth:token
-```
-
-If not logged in, type the following and enter your credentials:
-
-```
-$ heroku login
-```
-
-### Create the App on Heroku
-
-After ensuring that you're logged in, you can create the app on Heroku as follows:
-
-```
-$ heroku create <your preferred name here>
-```
-
-Replace `<your preferred name here>` with the name you want (no spaces). Your name has to be unique on Heroku, so you might have to be a little creative.
-
-The name you choose will be the name of the app in your Heroku dashboard and the name used for the subdomain in the URL of your hosted app, e.g., `https://catcollector.herokuapp.com`
-
+- Make sure you are in your virtual environment
 
 ## 2. Ready the Django Project
 
@@ -78,7 +41,7 @@ Django has detailed deployment [docs](https://docs.djangoproject.com/en/3.0/howt
 First, let's install [`django-on-heroku`](https://github.com/pkrefta/django-on-heroku) which is a Python package that will help with the deployment process:
 
 ```
-$ pip3 install django-on-heroku
+$ pip install django-on-heroku
 ```
 
 ### Update `settings.py`
@@ -105,7 +68,7 @@ The built-in development server we've been running with `python3 manage.py runse
 Let's install it:
 
 ```
-$ pip3 install gunicorn
+$ pip install gunicorn
 ```
 
 ### Create & Configure `Procfile`
@@ -130,33 +93,79 @@ The project name should be the same as your project's folder name, however, you 
 WSGI_APPLICATION = 'catcollector.wsgi.application'
 # ^^^ catcollector is the project name
 ```
+> Note:  If you install any additional Python packages during development after your initial deployment, you will need to run `pip3 freeze > requirements.txt` again to update the **requirements.txt** after the install of the additional Python package.
 
-### Create a `requirements.txt`
-
-The `package.json` file we used in Node apps informed Heroku which Node modules the app needed to be installed.
-
-The equivalent in a Python app is the `requirements.txt` file.
-
-`pip3` has a `freeze` command for listing the installed Python packages. Let's check it out:
-
-```
-$ pip3 freeze
-```
-
-That list of packages is in the correct format for the `requirements.txt` file.
-
-Here's how we use Unix/Linux's `>` to redirect the output of `pip3 freeze` to a `requirements.txt` file (please spell correctly):
+We just installed two packages to get us deployed so lets go ahead and update our requirements.txt file
 
 ```
 $ pip3 freeze > requirements.txt
 ```
 
-Since we're not using [virtual environments](https://packaging.python.org/guides/installing-using-pip-and-virtualenv/), the list of requirements may actually include packages the Django project does not need. This is not a problem, the first deployment just might take a little longer as Heroku installs the extra packages.
+## 3. Connect a Remote Database
 
-However, the `requirements.txt` file may be edited to remove packages that you **are sure** your project doesn't need.
+- Navigate to [bit.io](bit.io)
+- Create a free account
+- Create a Database and name it
+- Navigate to the Connect tab
 
-> Note:  If you install any additional Python packages during development after your initial deployment, you will need to run `pip3 freeze > requirements.txt` again to update the **requirements.txt** after the install of the additional Python package.
-## 3. Commit the Changes
+Here is your connection strings you will supply to your Django app.
+
+- Open the 'settings.py' file
+- Match your Database connection to your bit.io values like shown below
+
+```
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': '<Database name>',
+        'USER': '<Username>',
+        'PASSWORD': '<API Key / Password>',
+        'HOST': 'db.bit.io',
+        'PORT': '5432',
+    }
+}
+```
+
+This will reconnect your Django app to your remote database.
+
+## 4. Set Environment Variables
+
+We need to set environment variables (secrets) on Heroku in the same way we needed to set our environmental variables in Unit 3.
+
+You'll notice that the settings.py contains a warning not to leave your secret key in production so copy the value and replace the line with the following:
+
+```
+# SECURITY WARNING: keep the secret key used in production secret! 
+SECRET_KEY = os.environ['SECRET_KEY']
+```
+Then navigate to your .env/activate file and at the very bottom of the file create your env variable.
+
+```
+# Env Variables
+export SECRET_KEY='<your secret key>'
+```
+> Note: If you accidentally publish your secret key to GitHub you can generate a new one [here](https://djecrety.ir/).
+Note the message to not run debug in production. Instead, we'll create an environment variable called MODE and set it to 'dev' in our .env/activate file locally and 'production' in the Heroku configvars. We can use a ternary operator to set the DEBUG to True or False based on the environment variable.
+
+
+settings.py
+```py
+# SECURITY WARNING: don't run with debug turned on in production! 
+# Replace the DEBUG = True with:
+DEBUG = True if os.environ['MODE'] == 'dev' else False
+```
+
+.env/activate
+```
+# Env Variables
+export SECRET_KEY='<your secret key>'
+export MODE='dev'
+```
+
+Create a .gitignore file in the root of your repo and add `.env` to it. 
+
+
+## 5. Commit the Changes
 
 Now let's commit the changes made to the project (make sure that you're on the `main` branch):
 
@@ -165,7 +174,7 @@ $ git add -A
 $ git commit -m "Config deployment"
 ```
 
-## 4. Deploy to Heroku
+## 6. Deploy to Heroku
 
 The `heroku` remote was added to the repo with the `heroku create` command ran earlier.
 
@@ -175,206 +184,7 @@ So, deploying the first time and re-deploying later is as easy as running this c
 $ git push heroku main
 ```
 
-> Note: If are unable to re-deploy when you run `git push heroku main` due to a "Updates were rejected because the tip of your..." message, re-deploy with `git push --force heroku main` instead.  The cause of this is unclear, so let's just blame it on Heroku :)
-The first deployment will take considerably longer than subsequent deployments because Heroku will have to install all of the Python packages.  However, during re-deployments, Heroku will only install/uninstall changes made to `requirements.txt`.
-
 Read the output during deployment carefully. You'll need to address the errors if the deployment fails.
-
-In the case of a successful first deployment - **the app is still not quite ready to run**...
-
-## 5. Migrate the Database Migrations
-
-### Checking that Heroku Created a PostgreSQL Database
-
-If a Django project is configured to use a PostgreSQL, Heroku automatically detects and creates a PostgreSQL database for the project.
-
-You can run the following command to verify this:
-
-```
-$ heroku pg
-```
-
-You should see an output similar to this:
-
-```
-=== DATABASE_URL
-Plan:                  Hobby-dev
-Status:                Available
-Connections:           0/20
-PG Version:            11.2
-Created:               2019-03-19 16:06 UTC
-Data Size:             7.9 MB
-Tables:                0
-Rows:                  0/10000 (In compliance) - refreshing
-Fork/Follow:           Unsupported
-Rollback:              Unsupported
-Continuous Protection: Off
-Add-on:                postgresql-parallel-89032
-```
-
-### Check and Migrate the Migrations
-
-First, let's run the command that shows us a list and status of the migrations for our local project:
-
-```
-$ python3 manage.py showmigrations
-```
-
-The output for the Cat Collector app looks like this:
-
-```
-admin
- [X] 0001_initial
- [X] 0002_logentry_remove_auto_add
- [X] 0003_logentry_add_action_flag_choices
-auth
- [X] 0001_initial
- [X] 0002_alter_permission_name_max_length
- [X] 0003_alter_user_email_max_length
- [X] 0004_alter_user_username_opts
- [X] 0005_alter_user_last_login_null
- [X] 0006_require_contenttypes_0002
- [X] 0007_alter_validators_add_error_messages
- [X] 0008_alter_user_username_max_length
- [X] 0009_alter_user_last_name_max_length
-contenttypes
- [X] 0001_initial
- [X] 0002_remove_content_type_name
-main_app
- [X] 0001_initial
- [X] 0002_feeding
- [X] 0003_auto_20190303_2329
- [X] 0004_cat_toys
- [X] 0005_photo
- [X] 0006_cat_user
-sessions
- [X] 0001_initial
-```
-
-We can run most any command we can locally on the Heroku server by prefacing the command with `heroku run` and substituting `python` for `python3` (Python 3 on Heroku's servers are configured as `python`).
-
-Let's check out the migrations for the deployed app:
-
-```
-$ heroku run python manage.py showmigrations
-```
-
-Which generates the following output for Cat Collector:
-
-```
-admin
- [ ] 0001_initial
- [ ] 0002_logentry_remove_auto_add
- [ ] 0003_logentry_add_action_flag_choices
-auth
- [ ] 0001_initial
- [ ] 0002_alter_permission_name_max_length
- [ ] 0003_alter_user_email_max_length
- [ ] 0004_alter_user_username_opts
- [ ] 0005_alter_user_last_login_null
- [ ] 0006_require_contenttypes_0002
- [ ] 0007_alter_validators_add_error_messages
- [ ] 0008_alter_user_username_max_length
- [ ] 0009_alter_user_last_name_max_length
-contenttypes
- [ ] 0001_initial
- [ ] 0002_remove_content_type_name
-main_app
- [ ] 0001_initial
- [ ] 0002_feeding
- [ ] 0003_auto_20190303_2329
- [ ] 0004_cat_toys
- [ ] 0005_photo
- [ ] 0006_cat_user
-sessions
- [ ] 0001_initial
-```
-
-Yup, the unchecked migrations tells us that they need to be migrated:
-
-```
-$ heroku run python manage.py migrate
-```
-
-Lots of `OK`s is a good sign!
-
-## 6. Set Environment Variables
-
-We need to set environment variables (secrets) on Heroku in the same way we needed to set our environmental variables in Unit 3.
-
-We need to install a package to handle environment variables in Python. 
-
-```
-pip3 install python-dotenv
-```
-
-Remember that if you add a dependency to your project, you need to add it to your list of requirements: 
-
-```
-pip3 freeze > requirements.txt
-```
-
-```py
-# At the top of the settings.py file add:
-import os
-from dotenv import load_dotenv
-load_dotenv()
-```
-
-This should look familiar, as it's very reminiscent of how we added environmental variables in our Node applications. 
-
-You'll notice that the settings.py contains a warning not to leave your secret key in production so copy it into your .env file and replace it with the following:
-
-```
-# SECURITY WARNING: keep the secret key used in production secret! 
-# Copy the entire SECRET_KEY line into your .env file and then change it to read:
-SECRET_KEY = os.getenv('SECRET_KEY')
-```
-
-> Note: If you accidentally publish your secret key to GitHub you can generate a new one [here](https://djecrety.ir/).
-Note the message to not run debug in production. Instead, we'll create an environment variable called MODE and set it to 'dev' in our .env file locally and 'production' in the Heroku configvars. We can use a ternary operator to set the DEBUG to True or False based on the environment variable.
-
-```py
-# SECURITY WARNING: don't run with debug turned on in production! 
-# Replace the DEBUG = True with:
-DEBUG = True if os.getenv('MODE') == 'dev' else False
-```
-
-Create a .env file INSIDE the catcollector project folder. It needs to be on the same level as `settings.py`. Create a .gitignore file in the root of your repo and add `.env` to it. 
-
-In the .env file, add your variables: 
-
-```
-SECRET_KEY = 'f_fy=)1l62qjcxyc_@%9*&ie8k_lbhx)i0s1005y!s-rx7m26-'
-MODE = dev
-```
-
-Next we'll set our environmental variables via the Heroku CLI. 
-
-Setting the environment variables via the command line automatically restarts the server - which is necessary.  If you set the _config vars_ in Heroku's Dashboard, it won't restart the server.  However, you can restart the server manually using<br>`$ heroku restart`
-
-After you are finished setting all of the environment variables, you can verify them as follows:
-
-```
-$ heroku config:set SECRET_KEY='f_fy=)1l62qjcxyc_@%9*&ie8k_lbhx)i0s1005y!s-rx7m26-'
-$ heroku config:set MODE=prod
-```
-
-Let's check to see if our new variables have been saved: 
-
-```
-heroku config 
-```
-
-Included in the output will be a `DATABASE_URL` that Heroku automatically added for our Postgres database.
-
-Add, commit and push your changes to your Heroku remote: 
-
-```
-git add . 
-git commit -m "Hide environmental variables" 
-git push heroku main
-```
 
 ## 7. Open the Application
 
@@ -394,24 +204,5 @@ The following command shows Heroku's log for our app and is useful for troublesh
 $ heroku logs
 ``` 
 
-## 9. Create the superuser
-
-Because the database is "fresh", there's no superuser yet.
-
-```
-$ heroku run python manage.py createsuperuser
-```
-
-It's the same process as locally, just a bit slower.
-
-## 10. Test the Admin Portal
-
-Okay, the finale is to browse to:
-
-`https://<your app name>.herokuapp.com/admin`
-
-to checkout the admin portal:
-
-<img src="https://i.imgur.com/fFsrfae.png">
 
 ### Congrats!
