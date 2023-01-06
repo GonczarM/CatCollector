@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 import os
 
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -20,10 +21,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'v#nge!-v27dis6s^ai_^3&@g(t1qz8iijho70n*%0e6ubz9*=i'
+SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = True if os.environ('MODE') == 'dev' else False
 
 ALLOWED_HOSTS = []
 
@@ -79,7 +80,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'GonczarM/catCollector',
         'USER': 'GonczarM',
-        'PASSWORD': 'v2_3xh3y_Dw8kKZPkXfQeWebTJdmYy2v',
+        'PASSWORD': os.environ['DB_PASSWORD'],
         'HOST': 'db.bit.io',
         'PORT': '5432',
     }
