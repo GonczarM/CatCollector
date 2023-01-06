@@ -224,8 +224,6 @@ Now that your Heroku application is properly configured, it's time to connect yo
 5. To remove this add-on navigate to the Resources tab and delete the PostgreSQL add-on
 
 
-Once you have added all your config vars restart your dyno by clicking the more button in the top right and selcet Restart all dynos
-
 Your app should then deploy and build successfully!
 
 Since the database is new, there will not be any users or data.  After creating a new cat, celebrate! 
