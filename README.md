@@ -104,7 +104,7 @@ $ pip3 freeze > requirements.txt
 
 There you will find the connection strings you will supply to your Django app.
 
-- Open the 'settings.py' file
+- Open the `settings.py` file
 - Match your Database connection to your bit.io values like shown below
 
 ```py
