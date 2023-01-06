@@ -10,7 +10,6 @@
 4. Set Environment Variables
 5. Commit Changes
 6. Deploy to Heroku
-7. Troubleshooting
 
 ## 1. Preparation
 
@@ -148,15 +147,19 @@ export SECRET_KEY='<your secret key>'
 Note the message to not run debug in production. Instead, we'll create an environment variable called MODE and set it to 'dev' in our .env/activate file locally and 'production' in the Heroku configvars. We can use a ternary operator to set the DEBUG to True or False based on the environment variable.
 
 
-settings.py
+
 ```py
+# settings.py
+
 # SECURITY WARNING: don't run with debug turned on in production! 
 # Replace the DEBUG = True with:
 DEBUG = True if os.environ['MODE'] == 'dev' else False
 ```
 
-.env/activate
+
 ```
+# .env/activate
+
 # Env Variables
 export SECRET_KEY='<your secret key>'
 export MODE='dev'
@@ -166,7 +169,6 @@ export MODE='dev'
 
 We need to limit the accessibility of our database to just this application. We can set the database password to an env variable for that security.
 
-settings.py
 ```
 DATABASES = {
     'default': {
