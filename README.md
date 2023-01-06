@@ -203,19 +203,26 @@ $ git push origin main
 
 - Open up your [Heroku Dashboard](https://dashboard.heroku.com) and create a new app.
 - Name your app and then create.
-- Just like Unit 3 we are going to connect to GitHub with Heroku.
-- Once you have logged in with github, search for the repo you want to deploy and connect.
-- Enable Automatic Deploys and deploy the main branch.
-- On first deploy of a postgres db heroku will create a PostgreSQL "mini" database add-on. We will using bit.io instead so luckily, once removed, Heroku won't add it back in subsequent deployments.
-- To remove this add-on navigate to the Resources tab and delete the PostgreSQL add-on
+- After creating your application you'll be taken to the application page. From here, naviagte to your application settings.
 
 ### Config Vars
 
-- Navigate over to the Settings tab and Reveal Config Vars
+- Reveal Config Vars
 - This is where you will create the key value pairs for each of your env variables. 
 - DB_PASSWORD and SECRET_KEY should remain the same
 - MODE will change its value to production
 > Note: you do not need qoutation marks for your values on heroku
+
+### Deploy 
+
+Now that your Heroku application is properly configured, it's time to connect your GitHub account and deploy your app from GitHub.
+
+1. Select the Deploy option in your application page toolbar, select GitHub as your deployment method, and then connect your GitHub account.
+2. Once you've connected your GitHub account, specify which repository you'll use to deploy your application.
+3. Upon selecting your repository, you can select a specific branch to deploy your app from. In this readme we specified the main branch. Enable automatic deploys so that your Heroku app updates every time the branch you selected is pushed to.
+4. On first deploy of a postgres db heroku will create a PostgreSQL "mini" database add-on. We will using bit.io instead so luckily, once removed, Heroku won't add it back in subsequent deployments.
+5. To remove this add-on navigate to the Resources tab and delete the PostgreSQL add-on
+
 
 Once you have added all your config vars restart your dyno by clicking the more button in the top right and selcet Restart all dynos
 
