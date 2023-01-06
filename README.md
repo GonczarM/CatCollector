@@ -107,7 +107,7 @@ Here is your connection strings you will supply to your Django app.
 - Open the 'settings.py' file
 - Match your Database connection to your bit.io values like shown below
 
-```
+```py
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -130,13 +130,13 @@ We need to set environment variables (secrets) on Heroku in the same way we need
 
 You'll notice that the settings.py contains a warning not to leave your secret key in production so copy the value and replace the line with the following:
 
-```
+```py
 # SECURITY WARNING: keep the secret key used in production secret! 
 SECRET_KEY = os.environ['SECRET_KEY']
 ```
 Then navigate to your .env/activate file and at the very bottom of the file create your env variable.
 
-```
+```py
 # Env Variables
 export SECRET_KEY='<your secret key>'
 ```
@@ -169,7 +169,7 @@ export MODE='dev'
 
 We need to limit the accessibility of our database to just this application. We can set the database password to an env variable for that security.
 
-```
+```py
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
